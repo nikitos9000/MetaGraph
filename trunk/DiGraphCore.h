@@ -267,4 +267,6 @@ private:
     }
 };
 
+const size_t DiGraphCore::EMPTY_ARC;
+
 #endif // DIGRAPHCORE_H

@@ -1,5 +1,17 @@
 #include "GModel.h"
 
+const unsigned int GModelStateDiGraphSelected::None;
+const unsigned int GModelStateDiGraphSelected::Vertex;
+const unsigned int GModelStateDiGraphSelected::VertexMulti;
+const unsigned int GModelStateDiGraphSelected::Arc;
+const unsigned int GModelStateDiGraphSelected::ArcMulti;
+const unsigned int GModelStateDiGraphSelected::VertexSet;
+const unsigned int GModelStateDiGraphSelected::VertexSetMulti;
+const unsigned int GModelStateDiGraphSelected::ArcSet;
+const unsigned int GModelStateDiGraphSelected::ArcSetMulti;
+const unsigned int GModelStateDiGraphSelected::Path;
+const unsigned int GModelStateDiGraphSelected::PathMulti;
+
 GModelState::GModelState(GStorage& gstorage) : _gstorage(gstorage), _selected(GModelStateSelected::None)
 {
 }
