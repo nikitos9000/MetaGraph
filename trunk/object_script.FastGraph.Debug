@@ -1,0 +1,14 @@
+INPUT(
+./debug\main.o
+./debug\DiGraph.o
+./debug\DiGraphWeighted.o
+./debug\Path.o
+./debug\VertexSet.o
+./debug\ArcSet.o
+./debug\GView.o
+./debug\GController.o
+./debug\GModel.o
+./debug\GStorage.o
+./debug\WindowMain.o
+./debug\moc_WindowMain.o
+);

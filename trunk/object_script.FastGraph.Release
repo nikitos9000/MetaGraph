@@ -1,0 +1,14 @@
+INPUT(
+./release\main.o
+./release\DiGraph.o
+./release\DiGraphWeighted.o
+./release\Path.o
+./release\VertexSet.o
+./release\ArcSet.o
+./release\GView.o
+./release\GController.o
+./release\GModel.o
+./release\GStorage.o
+./release\WindowMain.o
+./release\moc_WindowMain.o
+);
