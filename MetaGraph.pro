@@ -2,7 +2,7 @@
 # Project created by QtCreator 2010-01-13T21:15:37
 # -------------------------------------------------
 # QT -= gui
-TARGET = FastGraph
+TARGET = MetaGraph
 
 # CONFIG += console
 # CONFIG -= app_bundle
