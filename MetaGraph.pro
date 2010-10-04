@@ -34,5 +34,8 @@ HEADERS += DiGraph.h \
     DiGraphCore.h \
     IPath.h \
     square_matrix.h \
-    test.h
+    test.h \
+    DiGraphBase.h \
+    IVertexSet.h \
+    IArcSet.h
 FORMS += WindowMain.ui
