@@ -3,8 +3,6 @@
 
 #include <algorithm>
 
-#include <ctime>
-
 template< typename T >
 class square_matrix
 {
