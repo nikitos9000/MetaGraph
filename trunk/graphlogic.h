@@ -26,12 +26,13 @@ namespace Ui {
 class GraphLogicProgressHandler
 {
 public:
-    GraphLogicProgressHandler(QProgressDialog* dialog) : _dialog(dialog) {};
-    GraphLogicProgressHandler(const GraphLogicProgressHandler& other) : _dialog(other._dialog) {};
+    GraphLogicProgressHandler(QProgressDialog* dialog) : _dialog(dialog) {}
+    GraphLogicProgressHandler(const GraphLogicProgressHandler& other) : _dialog(other._dialog) {}
 
     int ticks() const { return _dialog->maximum() - _dialog->minimum() + 1; }
     int tick() const { return _dialog->value(); }
     void setTick(int value) { _dialog->setValue(std::min(_dialog->maximum(), value)); }
+    bool canceled() const { return _dialog->wasCanceled(); }
 
 private:
     QProgressDialog* _dialog;

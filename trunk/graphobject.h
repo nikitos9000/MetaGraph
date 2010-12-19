@@ -5,6 +5,7 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 #include "graph.h"
 #include "graphtsp.h"
@@ -69,19 +70,18 @@ GraphObjectTSP* GraphObject::calculateTSP(ProgressHandler progressHandler) const
     double weight = tsp->pathWeight();
     delete tsp;
 
+    rotate(path.begin(), min_element(path.begin(), path.end()), path.end());
+
     for (unsigned int i = 0; i < path.size(); ++i)
         vertexList.push_back(getVertex(path[i]));
 
-    //if (path.size() > 0) path.push_back(path.front());
-    for (unsigned int i = 1; i < path.size(); ++i)
+    for (unsigned int i = 0; i < path.size(); ++i)
     {
-        GraphObjectVertex* startVertex = getVertex(path[i - 1]);
-        GraphObjectVertex* endVertex = getVertex(path[i]);
+        GraphObjectVertex* startVertex = getVertex(path[i]);
+        GraphObjectVertex* endVertex = getVertex(i < path.size() - 1 ? path[i + 1] : path.front());
 
         GraphObjectArc* arc = getArc(startVertex, endVertex);
-        if (arc == 0) return 0;
-
-        arcList.push_back(arc);
+        if (arc != 0) arcList.push_back(arc);
     }
 
     return new GraphObjectTSP(vertexList, arcList, weight);
