@@ -426,7 +426,7 @@ void GraphLogic::menuActionAbout()
 {
     QMessageBox::about(_mainWindow,
         trUtf8("TSPGraph 0.0.1"),
-        trUtf8("Это программа <b>TSP Graph</b>.<br>Она решает задачу коммивояжера. Возможно.<br><br><i>Автор: Никита Алексеевич Сметанин, Р-38032, 2010 г.</i>"));
+        trUtf8("Это программа <b>TSP Graph</b>.<br>Она решает задачу коммивояжера. Возможно.<br><br><i>Автор: Сметанин Никита Алексеевич, Р-38032</i><br><i>РТФ, УрФУ, 2010 г.</i>"));
 }
 
 void GraphLogic::menuActionAboutQt()
