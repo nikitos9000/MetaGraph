@@ -2,12 +2,13 @@
 #define GRAPH_H
 
 #include <vector>
-#include <stack>
 #include <tr1/unordered_map>
 #include <limits>
 
 #include "graphcore.h"
 #include "graphtsp.h"
+
+using namespace std;
 
 using namespace std;
 using namespace std::tr1;
@@ -47,7 +48,8 @@ private:
 template< class ProgressHandler >
 GraphTSP* Graph::calculateTSP(GraphTSP::TSPType type, ProgressHandler progressHandler) const
 {
-    const double maxDouble = numeric_limits<double>::max();
+    const double maxDouble = numeric_limits<double>::infinity();
+    const int maxInt = numeric_limits<int>::max();
 
     vector<int> vertexList;
     vertexList.reserve(_core.vertexCount());
@@ -59,23 +61,32 @@ GraphTSP* Graph::calculateTSP(GraphTSP::TSPType type, ProgressHandler progressHa
 
     int n = _core.vertexCount();
     if (n < 1) return 0;
-    if (n > (numeric_limits<int>::max() >> n)) return 0;
+    if (n > (maxInt >> n)) return 0;
 
     int length = (1 << n) * n;
     double* tspMatrix = new double[length];
+    int* parentMatrix = new int[length];
 
-    long long totalOpCount = length + (long long)(((1 << n) - 1) / 2) * (n - 1) * n + (n - 1) * (n - 1) + n;
+    long long totalOpCount = 2 * length + (long long)(((1 << n) - 1) / 2) * (n - 1) * n + (n - 1) * (n - 1) + n;
     long long opCountStep = totalOpCount / progressHandler.ticks();
     long long opCount = 0;
 
-    for (int i = 0; i < length; ++i)
+    fill_n(tspMatrix, length, maxDouble);
+    progressHandler.setTick(progressHandler.tick() + length / opCountStep);
+    if (progressHandler.canceled())
     {
-        if (++opCount >= opCountStep)
-        {
-            opCount = 0;
-            progressHandler.setTick(progressHandler.tick() + 1);
-        }
-        tspMatrix[i] = maxDouble / 2;
+        delete[] tspMatrix;
+        delete[] parentMatrix;
+        return 0;
+    }
+
+    fill_n(parentMatrix, length, maxInt);
+    progressHandler.setTick(progressHandler.tick() + length / opCountStep);
+    if (progressHandler.canceled())
+    {
+        delete[] tspMatrix;
+        delete[] parentMatrix;
+        return 0;
     }
 
     tspMatrix[n] = 0;
@@ -85,71 +96,77 @@ GraphTSP* Graph::calculateTSP(GraphTSP::TSPType type, ProgressHandler progressHa
         {
             if ((opCount += n) >= opCountStep)
             {
+                if (progressHandler.canceled())
+                {
+                    delete[] tspMatrix;
+                    delete[] parentMatrix;
+                    return 0;
+                }
+
                 opCount -= opCountStep;
                 progressHandler.setTick(progressHandler.tick() + 1);
             }
 
             if ((mask & 1 << i) != 0)
             {
+                const int vertexIndexFirst = vertexList[i];
+
                 for (int j = 0; j < n; ++j)
                     if ((mask & 1 << j) != 0)
                     {
-                        const int vi = vertexList[i];
-                        const int vj = vertexList[j];
+                        const int vertexIndexSecond = vertexList[j];
 
-                            tspMatrix[mask * n + i] = min(tspMatrix[mask * n + i],
-                                                          tspMatrix[(mask ^ 1 << i) * n + j] + _core.weightArc(vi, vj));
+                        const int firstIndex = mask * n + i;
+                        const int secondIndex = (mask ^ 1 << i) * n + j;
+                        double& firstWeight = tspMatrix[firstIndex];
+                        const double secondWeight = tspMatrix[secondIndex] + _core.weightArc(vertexIndexSecond, vertexIndexFirst);
+
+                        if (firstWeight > secondWeight)
+                        {
+                            firstWeight = secondWeight;
+                            parentMatrix[firstIndex] = secondIndex;
+                        }
                     }
             }
         }
     }
 
-    int resultIndex = ((1 << n) - 1) * n;
+    const int resultIndex = ((1 << n) - 1) * n;
     double result = maxDouble;
+    int pathStart = maxInt;
     for (int i = 1; i < n; ++i)
     {
         if (++opCount >= opCountStep)
         {
+            if (progressHandler.canceled())
+            {
+                delete[] tspMatrix;
+                delete[] parentMatrix;
+                return 0;
+            }
+
             opCount = 0;
             progressHandler.setTick(progressHandler.tick() + 1);
         }
 
-        const int vi = vertexList[i];
-        const int v0 = vertexList[0];
+        const int vertexIndexFirst = vertexList[i];
+        const int vertexIndexZero = vertexList[0];
 
-            result = min(result, tspMatrix[resultIndex + i] + _core.weightArc(vi, v0));
+        const double value = tspMatrix[resultIndex + i] + _core.weightArc(vertexIndexFirst, vertexIndexZero);
+        if (result > value)
+        {
+            result = value;
+            pathStart = resultIndex + i;
+        }
     }
 
     vector<int> order;
-    //order.push_back(_vertexReverseMap.find(vertexList[0])->second);
 
-    int current = (1 << n) - 1;
-    for (int i = 1; i < n; ++i)
-    {
-        int vertexIndex = -1;
-        for (int j = 1; j < n; ++j)
-        {
-            if (++opCount >= opCountStep)
-            {
-                opCount = 0;
-                progressHandler.setTick(progressHandler.tick() + 1);
-            }
+    for (int pathIndex = pathStart; pathIndex != maxInt; pathIndex = parentMatrix[pathIndex])
+        order.push_back(_vertexReverseMap.find(vertexList[pathIndex % n])->second);
 
-            if ((current & 1 << j) != 0)
-            {
-                const int vv = vertexList[vertexIndex];
-                const int vj = vertexList[j];
-                const int v0 = vertexList[0];
-
-                if (vertexIndex == -1 || (tspMatrix[resultIndex + vertexIndex] + _core.weightArc(vv, v0) >
-                                         tspMatrix[resultIndex + j] + _core.weightArc(vj, v0)))
-                    vertexIndex = j;
-            }
-        }
-        order.push_back(_vertexReverseMap.find(vertexList[vertexIndex])->second);
-        current ^= 1 << vertexIndex;
-    }
     delete[] tspMatrix;
+    delete[] parentMatrix;
 
     return new GraphTSP(type, order, result);
 }

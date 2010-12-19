@@ -169,10 +169,10 @@ public:
 
     double weightArc(size_t start_index, size_t end_index) const
     {
-        if (!checkIndex(start_index) || !checkIndex(end_index)) return numeric_limits<double>::max();
+        if (!checkIndex(start_index) || !checkIndex(end_index)) return numeric_limits<double>::infinity();
 
         const size_t& arcIndex = _matrix.at(start_index, end_index);
-        if (arcIndex == EMPTY_ARC) return numeric_limits<double>::max();
+        if (arcIndex == EMPTY_ARC) return start_index == end_index ? 0.0 : numeric_limits<double>::infinity();
 
         return _arcArray[arcIndex].weight;
     }

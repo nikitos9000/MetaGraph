@@ -1,4 +1,4 @@
-﻿#include <QString>
+#include <QString>
 #include <QStringList>
 #include <QtCore>
 #include <QImage>
@@ -396,7 +396,6 @@ void GraphLogic::menuActionTSP()
 
     QProgressDialog progressDialog(trUtf8("Решаю задачу коммивояжера..."), trUtf8("Отмена"), 1, 100, _mainWindow);
     progressDialog.setModal(true);
-    progressDialog.setValue(progressDialog.minimum());
 
     _graphObjectTSP = _graphObject->calculateTSP(GraphLogicProgressHandler(&progressDialog));
 
@@ -405,7 +404,7 @@ void GraphLogic::menuActionTSP()
         progressDialog.setValue(progressDialog.maximum());
         updateUiItems();
     }
-    else
+    else if (!progressDialog.wasCanceled())
     {
         progressDialog.cancel();
         QMessageBox messageBox(QMessageBox::Warning, trUtf8("Печаль"), trUtf8("Поиск решения задачи коммивояжера провалился =("), QMessageBox::Ok, _mainWindow);
@@ -427,7 +426,7 @@ void GraphLogic::menuActionAbout()
 {
     QMessageBox::about(_mainWindow,
         trUtf8("TSPGraph 0.0.1"),
-        trUtf8("Это программа <b>TSP Graph</b>.<br>Она решает задачу коммивояжера. Возможно.<br><br><i>Автор: Никита Алексеевич Сметанин, � -38032, 2010 г.</i>"));
+        trUtf8("Это программа <b>TSP Graph</b>.<br>Она решает задачу коммивояжера. Возможно.<br><br><i>Автор: Никита Алексеевич Сметанин, Р-38032, 2010 г.</i>"));
 }
 
 void GraphLogic::menuActionAboutQt()
