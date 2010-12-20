@@ -335,8 +335,6 @@ void GraphLogic::menuActionChange()
         if (!inputAccepted) return;
 
         vertex->setLabel(newLabel.toStdWString());
-
-        _graphScene->node(id)->setLabel(newLabel);
     }
     else if (!_graphSelectedEdges.isEmpty())
     {
@@ -638,6 +636,13 @@ void GraphLogic::setGraphObject(GraphObject* graphObject)
     _graphScene = new GraphScene(this);
     populateGraphScene(_graphScene, _graphObject);
     _graphView->setScene(_graphScene);
+
+    map<int, GraphObjectVertex*> vertexList = graphObject->vertexList();
+    map<int, GraphObjectVertex*>::iterator vertexListIt = vertexList.begin();
+    map<int, GraphObjectVertex*>::iterator vertexListEndIt = vertexList.end();
+
+    for (; vertexListIt != vertexListEndIt; ++vertexListIt)
+        _graphView->ensureVisible(_graphScene->node(vertexListIt->first), GraphScene::GRID_SIZE, GraphScene::GRID_SIZE);
 }
 
 void GraphLogic::populateGraphScene(GraphScene* graphScene, GraphObject* graphObject)
@@ -654,7 +659,6 @@ void GraphLogic::populateGraphScene(GraphScene* graphScene, GraphObject* graphOb
         QString label = QString::number(vertex->id());
 
         GraphSceneNode* node = graphScene->addNode(vertex->id(), label, vertex->x(), vertex->y());
-        _graphView->ensureVisible(node, GraphScene::GRID_SIZE, GraphScene::GRID_SIZE);
     }
 
     map<int, GraphObjectArc*> arcList = graphObject->arcList();
