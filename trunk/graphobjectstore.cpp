@@ -68,7 +68,7 @@ void GraphObjectStore::save(GraphObject* graphObject, wstring filename)
     }
 
     QFile file(QString::fromStdWString(filename));
-    if (!file.open(QIODevice::ReadWrite)) throw invalid_argument("GraphObjectStore::save() - can't save graph object to file");
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) throw invalid_argument("GraphObjectStore::save() - can't save graph object to file");
     QTextStream textStream(&file);
     document.save(textStream, 4);
     file.close();

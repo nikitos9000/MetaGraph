@@ -658,7 +658,7 @@ void GraphLogic::populateGraphScene(GraphScene* graphScene, GraphObject* graphOb
         GraphObjectVertex* vertex = vertexListIt->second;
         QString label = QString::number(vertex->id());
 
-        GraphSceneNode* node = graphScene->addNode(vertex->id(), label, vertex->x(), vertex->y());
+        graphScene->addNode(vertex->id(), label, vertex->x(), vertex->y());
     }
 
     map<int, GraphObjectArc*> arcList = graphObject->arcList();
