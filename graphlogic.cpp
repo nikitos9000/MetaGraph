@@ -263,6 +263,9 @@ void GraphLogic::menuActionExport()
     QRectF imageRect(QPointF(0, 0), imageSize);
 
     QPainter painter(&image);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
     _graphScene->drawBackground(&painter, imageRect);
     _graphScene->render(&painter, imageRect, boundingRect);
 
