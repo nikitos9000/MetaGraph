@@ -21,7 +21,7 @@ int Graph::vertexCount() const
 
 int Graph::arcCount() const
 {
-    return _core.arcCount();
+    return _core.arcCount() / 2;
 }
 
 bool Graph::addVertex(int id)
