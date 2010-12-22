@@ -68,7 +68,7 @@ GraphTSP* Graph::calculateTSP(GraphTSP::TSPType type, ProgressHandler progressHa
     int* parentMatrix = new int[length];
 
     long long totalOpCount = 2 * length + (long long)(((1 << n) - 1) / 2) * (n - 1) * n + (n - 1) * (n - 1) + n;
-    long long opCountStep = totalOpCount / progressHandler.ticks();
+    long long opCountStep = totalOpCount / progressHandler.ticks() + 1;
     long long opCount = 0;
 
     fill_n(tspMatrix, length, maxDouble);
@@ -167,6 +167,7 @@ GraphTSP* Graph::calculateTSP(GraphTSP::TSPType type, ProgressHandler progressHa
 
     delete[] tspMatrix;
     delete[] parentMatrix;
+    if (result == maxDouble) return 0;
 
     return new GraphTSP(type, order, result);
 }
