@@ -196,7 +196,19 @@ void GraphLogic::menuActionOpen()
     QString filename = QFileDialog::getOpenFileName(_ui->graphFrame, trUtf8("Выберите файл для открытия..."), QString(), trUtf8("Граф (*.grf)"));
     if (filename.isEmpty()) return;
 
-    setGraphObject(_graphObjectStore->load(filename.toStdWString()));
+    GraphObject* graphObject;
+    try
+    {
+        graphObject = _graphObjectStore->load(filename.toStdWString());
+    }
+    catch(exception e)
+    {
+        QMessageBox messageBox(QMessageBox::Warning, trUtf8("Печаль"), trUtf8("Невозможно открыть граф из ") + filename + trUtf8("<br>") + trUtf8(e.what()), QMessageBox::Ok, _mainWindow);
+        messageBox.exec();
+        return;
+    }
+
+    setGraphObject(graphObject);
     _graphFilename = filename;
     _graphSelectedNodes.clear();
     _graphSelectedEdges.clear();
@@ -226,7 +238,17 @@ void GraphLogic::menuActionSaveAs()
     QString filename = QFileDialog::getSaveFileName(_ui->graphFrame, trUtf8("Выберите файл для сохранения..."), QString(), trUtf8("Граф (*.grf)"));
     if (filename.isEmpty()) return;
 
-    _graphObjectStore->save(_graphObject, filename.toStdWString());
+    try
+    {
+        _graphObjectStore->save(_graphObject, filename.toStdWString());
+    }
+    catch(exception e)
+    {
+        QMessageBox messageBox(QMessageBox::Warning, trUtf8("Печаль"), trUtf8("Невозможно сохранить граф в ") + filename + trUtf8("<br>") + trUtf8(e.what()), QMessageBox::Ok, _mainWindow);
+        messageBox.exec();
+        return;
+    }
+
     _graphFilename = filename;
     _graphChanged = false;
     updateUi();
@@ -270,7 +292,11 @@ void GraphLogic::menuActionExport()
     _graphScene->render(&painter, imageRect, boundingRect);
 
     painter.end();
-    image.save(filename);
+    if (!image.save(filename))
+    {
+        QMessageBox messageBox(QMessageBox::Warning, trUtf8("Печаль"), trUtf8("Невозможно экспортировать граф в ") + filename, QMessageBox::Ok, _mainWindow);
+        messageBox.exec();
+    }
 }
 
 
