@@ -1,4 +1,4 @@
-#include "digraphcore.h"
+#include "DiGraphCore.h"
 #include "DiGraphCoreVertexIterator.h"
 #include "DiGraphCoreArcIterator.h"
 #include "DiGraphCoreOutArcIterator.h"

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <iterator>
-#include "digraphcore.h"
+#include "DiGraphCore.h"
 
 class DiGraphCore;
 
