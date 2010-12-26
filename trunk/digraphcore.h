@@ -13,32 +13,56 @@ using namespace std;
 
 class DiGraphCore
 {
+private:
+    struct VertexStruct;
+    struct ArcStruct;
+
 public:
+    class VertexIterator;
+    class ArcIterator;
+    class OutArcIterator;
+    class InArcIterator;
+
+    struct Vertex
+    {
+        size_t index;
+    };
+
+    struct Arc
+    {
+        size_t startIndex;
+        size_t endIndex;
+
+        double weight;
+    };
+
     DiGraphCore() : _vertexCount(0), _arcCount(0), _matrix(), _vertexArray(), _arcArray(), _vertexFreeStack(), _arcFreeStack()
     {
     }
 
     size_t addVertex()
     {
-        Vertex vertex;
-        vertex.outArcCount = 0;
-        vertex.inArcCount = 0;
-        vertex.outArcList = EMPTY_ARC;
-        vertex.inArcList = EMPTY_ARC;
-        vertex.isDeleted = false;
+        VertexStruct vertexStruct;
+        vertexStruct.outArcCount = 0;
+        vertexStruct.inArcCount = 0;
+        vertexStruct.outArcList = EMPTY_ARC;
+        vertexStruct.inArcList = EMPTY_ARC;
+        vertexStruct.isDeleted = false;
 
         size_t vertexIndex;
 
         if (!_vertexFreeStack.empty())
         {
             vertexIndex = _vertexFreeStack.top();
+            vertexStruct.vertex.index = vertexIndex;
             _vertexFreeStack.pop();
-            _vertexArray[vertexIndex] = vertex;
+            _vertexArray[vertexIndex] = vertexStruct;
         }
         else
         {
             _matrix.push_back(EMPTY_ARC);
-            _vertexArray.push_back(vertex);
+            vertexStruct.vertex.index = _vertexArray.size();
+            _vertexArray.push_back(vertexStruct);
             vertexIndex = _vertexArray.size() - 1;
         }
 
@@ -55,58 +79,63 @@ public:
     {
         if (!checkIndex(index)) return false;
 
-        Vertex& vertex = _vertexArray[index];
+        VertexStruct& vertex = _vertexArray[index];
+        vertex.isDeleted = true;
 
         size_t outArcIndex = vertex.outArcList;
 
         while (outArcIndex != EMPTY_ARC)
         {
-            Arc& arc = _arcArray[outArcIndex];
-            _matrix.at(arc.startIndex, arc.endIndex) = EMPTY_ARC;
+            ArcStruct& arcStruct = _arcArray[outArcIndex];
+            arcStruct.isDeleted = true;
+            _matrix.at(arcStruct.arc.startIndex, arcStruct.arc.endIndex) = EMPTY_ARC;
 
-            if (arc.nextInArc != EMPTY_ARC)
-                _arcArray[arc.nextInArc].previousInArc = arc.previousInArc;
+            if (arcStruct.nextInArc != EMPTY_ARC)
+                _arcArray[arcStruct.nextInArc].previousInArc = arcStruct.previousInArc;
 
-            if (arc.previousInArc != EMPTY_ARC)
-                _arcArray[arc.previousInArc].nextInArc = arc.nextInArc;
+            if (arcStruct.previousInArc != EMPTY_ARC)
+                _arcArray[arcStruct.previousInArc].nextInArc = arcStruct.nextInArc;
 
-            Vertex& endVertex = _vertexArray[arc.endIndex];
+            VertexStruct& endVertex = _vertexArray[arcStruct.arc.endIndex];
 
             --endVertex.inArcCount;
-            if (outArcIndex == endVertex.inArcList) endVertex.inArcList = arc.nextInArc;
+            if (outArcIndex == endVertex.inArcList) endVertex.inArcList = arcStruct.nextInArc;
 
             _arcFreeStack.push(outArcIndex);
-            outArcIndex = arc.nextOutArc;
+            outArcIndex = arcStruct.nextOutArc;
         }
 
         size_t inArcIndex = vertex.inArcList;
 
         while (inArcIndex != EMPTY_ARC)
         {
-            Arc& arc = _arcArray[inArcIndex];
-            _matrix.at(arc.startIndex, arc.endIndex) = EMPTY_ARC;
+            ArcStruct& arcStruct = _arcArray[inArcIndex];
+            arcStruct.isDeleted = true;
+            _matrix.at(arcStruct.arc.startIndex, arcStruct.arc.endIndex) = EMPTY_ARC;
 
-            if (arc.nextOutArc != EMPTY_ARC)
-                _arcArray[arc.nextOutArc].previousOutArc = arc.previousOutArc;
+            if (arcStruct.nextOutArc != EMPTY_ARC)
+                _arcArray[arcStruct.nextOutArc].previousOutArc = arcStruct.previousOutArc;
 
-            if (arc.previousOutArc != EMPTY_ARC)
-                _arcArray[arc.previousOutArc].nextOutArc = arc.nextOutArc;
+            if (arcStruct.previousOutArc != EMPTY_ARC)
+                _arcArray[arcStruct.previousOutArc].nextOutArc = arcStruct.nextOutArc;
 
-            Vertex& startVertex = _vertexArray[arc.startIndex];
+            VertexStruct& startVertex = _vertexArray[arcStruct.arc.startIndex];
 
             --startVertex.outArcCount;
-            if (inArcIndex == startVertex.outArcList) startVertex.outArcList = arc.nextOutArc;
+            if (inArcIndex == startVertex.outArcList) startVertex.outArcList = arcStruct.nextOutArc;
 
             _arcFreeStack.push(inArcIndex);
-            inArcIndex = arc.nextInArc;
+            inArcIndex = arcStruct.nextInArc;
         }
 
-        vertex.isDeleted = true;
         --_vertexCount;
 
         _vertexFreeStack.push(index);
         return true;
     }
+
+    VertexIterator beginVertexIterator() const;
+    VertexIterator endVertexIterator() const;
 
     bool addArc(size_t start_index, size_t end_index, double weight)
     {
@@ -118,14 +147,15 @@ public:
         size_t& outArcListHead = _vertexArray[start_index].outArcList;
         size_t& inArcListHead = _vertexArray[end_index].inArcList;
 
-        Arc arc;
-        arc.startIndex = start_index;
-        arc.endIndex = end_index;
-        arc.weight = weight;
-        arc.nextOutArc = outArcListHead;
-        arc.nextInArc = inArcListHead;
-        arc.previousOutArc = EMPTY_ARC;
-        arc.previousInArc = EMPTY_ARC;
+        ArcStruct arcStruct;
+        arcStruct.arc.startIndex = start_index;
+        arcStruct.arc.endIndex = end_index;
+        arcStruct.arc.weight = weight;
+        arcStruct.nextOutArc = outArcListHead;
+        arcStruct.nextInArc = inArcListHead;
+        arcStruct.previousOutArc = EMPTY_ARC;
+        arcStruct.previousInArc = EMPTY_ARC;
+        arcStruct.isDeleted = true;
 
         size_t arcIndex;
 
@@ -133,14 +163,13 @@ public:
         {
             arcIndex = _arcFreeStack.top();
             _arcFreeStack.pop();
-            _arcArray[arcIndex] = arc;
+            _arcArray[arcIndex] = arcStruct;
         }
-        else do
+        else
         {
-            _arcArray.push_back(arc);
+            _arcArray.push_back(arcStruct);
             arcIndex = _arcArray.size() - 1;
         }
-        while (arcIndex == EMPTY_ARC);
 
         if (outArcListHead != EMPTY_ARC)
             _arcArray[outArcListHead].previousOutArc = arcIndex;
@@ -174,7 +203,7 @@ public:
         const size_t& arcIndex = _matrix.at(start_index, end_index);
         if (arcIndex == EMPTY_ARC) return numeric_limits<double>::infinity();
 
-        return _arcArray[arcIndex].weight;
+        return _arcArray[arcIndex].arc.weight;
     }
 
     void setWeightArc(size_t start_index, size_t end_index, double weight)
@@ -184,7 +213,7 @@ public:
         const size_t& arcIndex = _matrix.at(start_index, end_index);
         if (arcIndex == EMPTY_ARC) return;
 
-        _arcArray[arcIndex].weight = weight;
+        _arcArray[arcIndex].arc.weight = weight;
     }
 
     bool removeArc(size_t start_index, size_t end_index)
@@ -194,27 +223,28 @@ public:
         size_t& arcIndex = _matrix.at(start_index, end_index);
         if (arcIndex == EMPTY_ARC) return false;
 
-        Arc& arc = _arcArray[arcIndex];
+        ArcStruct& arcStruct = _arcArray[arcIndex];
+        arcStruct.isDeleted = true;
 
-        if (arc.nextOutArc != EMPTY_ARC)
-            _arcArray[arc.nextOutArc].previousOutArc = arc.previousOutArc;
+        if (arcStruct.nextOutArc != EMPTY_ARC)
+            _arcArray[arcStruct.nextOutArc].previousOutArc = arcStruct.previousOutArc;
 
-        if (arc.previousOutArc != EMPTY_ARC)
-            _arcArray[arc.previousOutArc].nextOutArc = arc.nextOutArc;
+        if (arcStruct.previousOutArc != EMPTY_ARC)
+            _arcArray[arcStruct.previousOutArc].nextOutArc = arcStruct.nextOutArc;
 
-        if (arc.nextInArc != EMPTY_ARC)
-            _arcArray[arc.nextInArc].previousInArc = arc.previousInArc;
+        if (arcStruct.nextInArc != EMPTY_ARC)
+            _arcArray[arcStruct.nextInArc].previousInArc = arcStruct.previousInArc;
 
-        if (arc.previousInArc != EMPTY_ARC)
-            _arcArray[arc.previousInArc].nextInArc = arc.nextInArc;
+        if (arcStruct.previousInArc != EMPTY_ARC)
+            _arcArray[arcStruct.previousInArc].nextInArc = arcStruct.nextInArc;
 
         --_vertexArray[start_index].outArcCount;
         --_vertexArray[end_index].inArcCount;
 
         size_t& outArcListHead = _vertexArray[start_index].outArcList;
         size_t& inArcListHead = _vertexArray[end_index].inArcList;
-        if (arcIndex == outArcListHead) outArcListHead = arc.nextOutArc;
-        if (arcIndex == inArcListHead) inArcListHead = arc.nextInArc;
+        if (arcIndex == outArcListHead) outArcListHead = arcStruct.nextOutArc;
+        if (arcIndex == inArcListHead) inArcListHead = arcStruct.nextInArc;
 
         _arcFreeStack.push(arcIndex);
         arcIndex = EMPTY_ARC;
@@ -222,6 +252,13 @@ public:
         --_arcCount;
         return true;
     }
+
+    ArcIterator beginArcIterator() const;
+    ArcIterator endArcIterator() const;
+    OutArcIterator beginOutArcIterator(size_t index) const;
+    OutArcIterator endOutArcIterator(size_t index) const;
+    InArcIterator beginInArcIterator(size_t index) const;
+    InArcIterator endInArcIterator(size_t index) const;
 
     size_t vertexCount() const
     {
@@ -247,12 +284,25 @@ public:
         return _vertexArray[index].inArcCount;
     }
 
-private:
-    const static size_t EMPTY_VERTEX = 0;
-    const static size_t EMPTY_ARC = 0;
-
-    struct Vertex
+    void clear()
     {
+        _vertexCount = 0;
+        _arcCount = 0;
+        _vertexArray.clear();
+        _arcArray.clear();
+        while (!_vertexFreeStack.empty()) _vertexFreeStack.pop();
+        while (!_arcFreeStack.empty()) _arcFreeStack.pop();
+        _matrix.clear();
+    }
+
+private:
+    static const size_t EMPTY_VERTEX;
+    static const size_t EMPTY_ARC;
+
+    struct VertexStruct
+    {
+        Vertex vertex;
+
         size_t outArcCount;
         size_t inArcCount;
 
@@ -260,22 +310,18 @@ private:
         size_t inArcList;
 
         bool isDeleted;
-
-        size_t nextVertex;
-        size_t previousVertex;
     };
 
-    struct Arc
+    struct ArcStruct
     {
-        size_t startIndex;
-        size_t endIndex;
-
-        double weight;
+        Arc arc;
 
         size_t nextOutArc;
         size_t previousOutArc;
         size_t nextInArc;
         size_t previousInArc;
+
+        bool isDeleted;
     };
 
     size_t _vertexCount;
@@ -283,8 +329,8 @@ private:
 
     square_matrix< size_t > _matrix;
 
-    vector< Vertex > _vertexArray;
-    vector< Arc > _arcArray;
+    vector< VertexStruct > _vertexArray;
+    vector< ArcStruct > _arcArray;
 
     stack< size_t, vector< size_t > > _vertexFreeStack;
     stack< size_t, vector< size_t > > _arcFreeStack;
