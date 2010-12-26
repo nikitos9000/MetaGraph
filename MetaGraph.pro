@@ -19,7 +19,8 @@ SOURCES += main.cpp \
     graphobjectstore.cpp \
     graphtsp.cpp \
     graphlogic.cpp \
-    graphobjecttsp.cpp
+    graphobjecttsp.cpp \
+    digraphcore.cpp
 HEADERS += mainwindow.h \
     graphscene.h \
     graphview.h \
@@ -31,10 +32,14 @@ HEADERS += mainwindow.h \
     graphobjectarc.h \
     graphobjectstore.h \
     square_matrix.h \
-    graphcore.h \
+    digraphcore.h \
     graphtsp.h \
     graphlogic.h \
     graphobjecttsp.h \
-    symmetric_matrix.h
+    symmetric_matrix.h \
+    DiGraphCoreVertexIterator.h \
+    DiGraphCoreInArcIterator.h \
+    DiGraphCoreOutArcIterator.h \
+    DiGraphCoreArcIterator.h
 FORMS += mainwindow.ui
-RESOURCES +=
+RESOURCES += 

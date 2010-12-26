@@ -54,7 +54,7 @@ public:
                     {
                         T* matrix_row = _matrix + index * _capacity;
                         T* new_matrix_row = new_matrix + index * new_capacity;
-                        copy(matrix_row, matrix_row + _size, new_matrix_row);
+                        std::copy(matrix_row, matrix_row + _size, new_matrix_row);
                     }
                     delete[] _matrix;
                 }

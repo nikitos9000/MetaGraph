@@ -1,10 +1,8 @@
 #include <limits>
 
 #include "graph.h"
-#include "graphcore.h"
+#include "digraphcore.h"
 #include "graphtsp.h"
-
-const size_t DiGraphCore::EMPTY_ARC;
 
 Graph::Graph() : _vertexMap(), _core()
 {

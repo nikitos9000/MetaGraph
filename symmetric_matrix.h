@@ -8,7 +8,7 @@ class symmetric_matrix
 {
 public:
     symmetric_matrix() : _matrix(0), _size(0), _capacity(0) {}
-    symmetric_matrix(size_t n) : _matrix(new T[(n * (n - 1)) / 2]), _size(0), _capacity(n) {}
+    symmetric_matrix(size_t n) : _matrix(new T[(n * (n + 1)) / 2]), _size(0), _capacity(n) {}
 
     ~symmetric_matrix() { delete[] _matrix; }
 
@@ -17,15 +17,12 @@ public:
 
     T& at(size_t row, size_t column)
     {
-        if (row < column)
-            return _matrix[(column * _capacity) / 2 + row];
-        else
-            return _matrix[(row * _capacity) / 2 + column];
+        return _matrix[index(row, column)];
     }
 
     const T& at(size_t row, size_t column) const
     {
-        return _matrix[row * _capacity + column];
+        return _matrix[index(row, column)];
     }
 
     void push_back(const T& value = T())
@@ -49,28 +46,18 @@ public:
                 while (new_capacity < new_size)
                     new_capacity = new_capacity << 1;
 
-                T* new_matrix = new T[new_capacity * new_capacity];
+                T* new_matrix = new T[(new_capacity * (new_capacity + 1)) / 2];
 
                 if (_capacity > 0)
                 {
-                    for(size_t index = 0; index < _size; ++index)
-                    {
-                        T* matrix_row = _matrix + index * _capacity;
-                        T* new_matrix_row = new_matrix + index * new_capacity;
-                        copy(matrix_row, matrix_row + _size, new_matrix_row);
-                    }
+                    std::copy(_matrix, _matrix + (_size * (_size + 1)) / 2, new_matrix);
                     delete[] _matrix;
                 }
                 _matrix = new_matrix;
                 _capacity = new_capacity;
             }
 
-            for (size_t line = _size; line < new_size; ++line)
-                for (size_t index = 0; index < new_size; ++index)
-                {
-                    _matrix[line + index * _capacity] = value;
-                    _matrix[line * _capacity + index] = value;
-                }
+            std::fill_n(_matrix + (_size * (_size + 1)) / 2, (new_size * (new_size + 1)) / 2, value);
         }
         _size = new_size;
     }
@@ -84,6 +71,14 @@ private:
     T* _matrix;
     size_t _size;
     size_t _capacity;
+
+    size_t index(size_t row, size_t column) const
+    {
+        if (row < column)
+            return (column * (column + 1)) / 2 + row;
+        else
+            return (row * (row + 1)) / 2 + column;
+    }
 };
 
 #endif // SYMMETRIC_MATRIX_H
