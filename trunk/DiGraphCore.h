@@ -255,8 +255,10 @@ public:
 
     ArcIterator beginArcIterator() const;
     ArcIterator endArcIterator() const;
+
     OutArcIterator beginOutArcIterator(size_t index) const;
     OutArcIterator endOutArcIterator(size_t index) const;
+
     InArcIterator beginInArcIterator(size_t index) const;
     InArcIterator endInArcIterator(size_t index) const;
 

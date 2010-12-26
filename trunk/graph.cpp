@@ -1,7 +1,7 @@
 #include <limits>
 
 #include "graph.h"
-#include "digraphcore.h"
+#include "DiGraphCore.h"
 #include "graphtsp.h"
 
 Graph::Graph() : _vertexMap(), _core()

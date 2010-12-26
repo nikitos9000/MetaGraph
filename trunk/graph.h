@@ -5,7 +5,7 @@
 #include <tr1/unordered_map>
 #include <limits>
 
-#include "digraphcore.h"
+#include "DiGraphCore.h"
 #include "graphtsp.h"
 
 using namespace std;

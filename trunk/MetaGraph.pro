@@ -20,7 +20,7 @@ SOURCES += main.cpp \
     graphtsp.cpp \
     graphlogic.cpp \
     graphobjecttsp.cpp \
-    digraphcore.cpp
+    DiGraphCore.cpp
 HEADERS += mainwindow.h \
     graphscene.h \
     graphview.h \
@@ -32,7 +32,7 @@ HEADERS += mainwindow.h \
     graphobjectarc.h \
     graphobjectstore.h \
     square_matrix.h \
-    digraphcore.h \
+    DiGraphCore.h \
     graphtsp.h \
     graphlogic.h \
     graphobjecttsp.h \
