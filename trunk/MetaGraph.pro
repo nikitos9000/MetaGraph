@@ -34,6 +34,7 @@ HEADERS += mainwindow.h \
     graphcore.h \
     graphtsp.h \
     graphlogic.h \
-    graphobjecttsp.h
+    graphobjecttsp.h \
+    symmetric_matrix.h
 FORMS += mainwindow.ui
 RESOURCES +=
