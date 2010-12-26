@@ -13,7 +13,7 @@ using namespace std;
 using namespace std;
 using namespace std::tr1;
 
-class GraphCore;
+class DiGraphCore;
 class GraphTSP;
 
 class Graph
@@ -42,7 +42,7 @@ public:
 private:
     unordered_map<int, int> _vertexMap;
     unordered_map<int, int> _vertexReverseMap;
-    GraphCore _core;
+    DiGraphCore _core;
 };
 
 template< class ProgressHandler >
