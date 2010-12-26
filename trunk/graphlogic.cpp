@@ -13,7 +13,6 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "aboutqtwindow.h"
 #include "graphlogic.h"
 #include "graphview.h"
 #include "graphobject.h"
@@ -452,14 +451,13 @@ void GraphLogic::menuActionTSPClear()
 void GraphLogic::menuActionAbout()
 {
     QMessageBox::about(_mainWindow,
-        trUtf8("TSPGraph 0.0.1"),
-        trUtf8("Это программа <b>TSP Graph</b>.<br>Она решает задачу коммивояжера. Возможно.<br><br><i>Автор: Сметанин Никита Алексеевич, Р-38032</i><br><i>РТФ, УрФУ, 2010 г.</i>"));
+        trUtf8("MetaGraph 0.0.1"),
+        trUtf8("Это программа <b>MetaGraph</b>"));
 }
 
 void GraphLogic::menuActionAboutQt()
 {
-    AboutQtWindow aboutQt;
-    aboutQt.exec();
+    qApp->aboutQt();
 }
 
 void GraphLogic::sliderScale(int value)
@@ -482,7 +480,7 @@ void GraphLogic::quit()
 void GraphLogic::updateUi()
 {
     QString unnamedFile = trUtf8("Несохранённый граф");
-    _mainWindow->setWindowTitle((_graphFilename.isEmpty() ? unnamedFile : _graphFilename) + "[*] - TSPGraph");
+    _mainWindow->setWindowTitle((_graphFilename.isEmpty() ? unnamedFile : _graphFilename) + "[*] - MetaGraph");
     _mainWindow->setWindowModified(_graphChanged);
     _ui->actionSave->setEnabled(_graphChanged);
 }

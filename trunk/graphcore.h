@@ -11,10 +11,10 @@
 
 using namespace std;
 
-class GraphCore
+class DiGraphCore
 {
 public:
-    GraphCore() : _vertexCount(0), _arcCount(0), _matrix(), _vertexArray(), _arcArray(), _vertexFreeStack(), _arcFreeStack()
+    DiGraphCore() : _vertexCount(0), _arcCount(0), _matrix(), _vertexArray(), _arcArray(), _vertexFreeStack(), _arcFreeStack()
     {
     }
 

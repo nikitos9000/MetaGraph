@@ -4,7 +4,7 @@
 #include "graphcore.h"
 #include "graphtsp.h"
 
-const size_t GraphCore::EMPTY_ARC;
+const size_t DiGraphCore::EMPTY_ARC;
 
 Graph::Graph() : _vertexMap(), _core()
 {
