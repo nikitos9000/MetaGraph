@@ -1,0 +1,1 @@
+The Qt GUI graph theory user application
